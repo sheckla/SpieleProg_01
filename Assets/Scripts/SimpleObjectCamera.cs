@@ -10,6 +10,7 @@ public class SimpleObjectCamera : MonoBehaviour
     private float prevMouseX;
     private float cameraMovementX;
 
+// comment from sheckla-laptop
     [SerializeField] // prevent from being set to 0 after play-press
     private Vector3 offset;
 
