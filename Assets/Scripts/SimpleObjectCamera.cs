@@ -5,10 +5,19 @@ using UnityEngine;
 public class SimpleObjectCamera : MonoBehaviour
 {
     public Transform Target;
-    public float CameraSpeed = 10;
+    public float CameraSpeed = 1;
+
+
+    private float maxCameraAngleY = 30;
 
     private float prevMouseX;
+    private float prevMouseY;
     private float cameraMovementX;
+    private float cameraMovementY;
+
+
+    private float rotX;
+    private float rotY;
 
 // comment from sheckla-laptop
     [SerializeField] // prevent from being set to 0 after play-press
@@ -28,10 +37,21 @@ public class SimpleObjectCamera : MonoBehaviour
     // called after Update
     void LateUpdate()
     {
+
+        // Save Rotation
+        rotX += cameraMovementX * Time.deltaTime * CameraSpeed;
+        rotY += cameraMovementY * Time.deltaTime * CameraSpeed;
+
+        rotY = Mathf.Clamp(rotY, 10, 40);
+
+        transform.localEulerAngles = new Vector3(rotY, rotX, 0);
+        offset.z += Input.mouseScrollDelta.y;
+        /* offset.z = -Mathf.Clamp(offset.z, 2, 20); */
+        offset.z = Mathf.Clamp(offset.z, -30, -5);
         // Move camera to target entity
         transform.position = Target.position + (transform.forward * offset.z + transform.up * offset.y);
-        transform.Rotate(0, cameraMovementX * Time.deltaTime * CameraSpeed, 0);
 
+        //transform.Rotate(cameraMovementY * Time.deltaTime * CameraSpeed, cameraMovementX * Time.deltaTime * CameraSpeed, 0);
         //transform.position = (Target.position) - transform.forward;
         //print(scaledForward);
     }
@@ -44,6 +64,7 @@ public class SimpleObjectCamera : MonoBehaviour
         if (e.type == EventType.MouseDown)
         {
             prevMouseX = e.mousePosition.x;
+            prevMouseY = e.mousePosition.y;
             return;
         }
 
@@ -52,10 +73,15 @@ public class SimpleObjectCamera : MonoBehaviour
         {
             cameraMovementX = e.mousePosition.x - prevMouseX;
             prevMouseX = e.mousePosition.x;
+
+            cameraMovementY = e.mousePosition.y - prevMouseY;
+            prevMouseY = e.mousePosition.y;
             return;
         }
 
         // If neither MouseButtonDown nor MouseDrag - cameraMovement is null
         cameraMovementX = 0;
+        cameraMovementY = 0;
+
     }
 }
