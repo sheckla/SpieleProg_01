@@ -283,6 +283,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Fallguy
       objectReference: {fileID: 0}
+    - target: {fileID: 7746535247670615387, guid: bffce625e7b290b46a485123add78156, type: 3}
+      propertyPath: movementSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7746535247670615387, guid: bffce625e7b290b46a485123add78156, type: 3}
+      propertyPath: rotationSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8720527188764924014, guid: bffce625e7b290b46a485123add78156, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 303a74d69f393184d9d8803624f6f562, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bffce625e7b290b46a485123add78156, type: 3}
 --- !u!1 &1821740179
