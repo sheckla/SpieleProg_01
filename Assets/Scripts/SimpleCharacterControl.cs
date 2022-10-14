@@ -8,7 +8,8 @@ public class SimpleCharacterControl : MonoBehaviour
     [SerializeField]
     public float rotationSpeed;
     public float movementSpeed;
-    public bool isWalking = false;
+
+    private float currentSpeed = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -20,7 +21,7 @@ public class SimpleCharacterControl : MonoBehaviour
     void Update()
     {
         GameObject cam = GameObject.Find("Main Camera");
-        Debug.Log("" + isWalking);
+        //Debug.Log("" + isWalking);
         moveCharacter();
     }
 
@@ -49,10 +50,13 @@ public class SimpleCharacterControl : MonoBehaviour
             direction = cam.transform.right;
         }
 
-        if (!(Input.GetKey("w") || Input.GetKey("s") || Input.GetKey("a") || Input.GetKey("d")) && isWalking == true) isWalking = false;
+        if (Input.GetKey("w") || Input.GetKey("s") || Input.GetKey("a") || Input.GetKey("d")){ currentSpeed+=0.2f;}
+        else{ currentSpeed-=0.2f;}
+
+        animator.SetFloat("Speed",currentSpeed);
 
         if (direction.x == 0) {
-            animator.Play("Idle");
+            //animator.Play("Idle");
             return;
         };
 
@@ -61,13 +65,13 @@ public class SimpleCharacterControl : MonoBehaviour
         Quaternion look = Quaternion.LookRotation(direction);
         Quaternion lookY = Quaternion.Euler(0, look.eulerAngles.y, 0); // only use y-axis for rotation
         transform.rotation = Quaternion.Lerp(transform.rotation, lookY, rotationSpeed);
-        transform.Translate(0, 0, movementSpeed * Time.deltaTime);
 
-        if (isWalking == false)
-        {
-            animator.Play("Walk");
-            isWalking = true;   
-        }
+        if(currentSpeed>movementSpeed)currentSpeed=movementSpeed;
+        if(currentSpeed<0.0f)currentSpeed=0.0f;
+        
+        transform.Translate(0, 0, currentSpeed * Time.deltaTime);
+
+        
         
     }
 }
