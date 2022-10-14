@@ -62,23 +62,24 @@ public class SimpleCharacterControl : MonoBehaviour
         if(isGrounded()){
 
             isJumping=false;
-            
+
             if (Input.GetKey("w"))
             {
-                direction = cam.transform.forward;
+                direction += cam.transform.forward;
             }
             if (Input.GetKey("a"))
             {
-                direction = -cam.transform.right;
+                direction += -cam.transform.right;
             }
             if (Input.GetKey("s"))
             {
-                direction = -cam.transform.forward;
+                direction += -cam.transform.forward;
             }
             if (Input.GetKey("d"))
             {
-                direction = cam.transform.right;
+                direction += cam.transform.right;
             }
+            direction.Normalize();
             if (Input.GetKey("space"))
             {
                 rigidBody.AddForce(Vector3.up * 7.0f);
