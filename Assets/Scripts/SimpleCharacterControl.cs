@@ -4,27 +4,161 @@ using UnityEngine;
 
 public class SimpleCharacterControl : MonoBehaviour
 {
-    private Animator animator;
+    private Animator Anim;
+    private Rigidbody Rbody;
+    private CapsuleCollider CapColl;
+
     [SerializeField]
-    public float rotationSpeed;
-    public float movementSpeed;
-    public bool isWalking = false;
+    public float RotationSpeed;
+    public float MovementSpeed;     
+
+    // Smoothed movement momentum vals
+    private float FallMomentum = 1;
+    enum MomentumTypes {WalkMomentum, JumpMomentum} // specifies decay/growth for smooth transitions
+    public float RunMomentum = 0; 
+    public float JumpMomentum = 0;
+
+    private Vector3 InitialStartPosition;
+    private Vector3 Dir;
+    private bool Grounded;
 
     // Start is called before the first frame update
     void Start()
     {
-        animator = GetComponent<Animator>();
+        Anim = GetComponent<Animator>();
+        Rbody = GetComponent<Rigidbody>();
+        CapColl = GetComponent<CapsuleCollider>();
+        InitialStartPosition = Rbody.position;
     }
 
-    // Update is called once per frame
-    void Update()
+    // Called each Frame
+    void Update() 
     {
-        GameObject cam = GameObject.Find("Main Camera");
-        Debug.Log("" + isWalking);
-        moveCharacter();
+        // get direction via. keyboard inputs [W,A,S,D]
+        Dir = WASD_Dir();
     }
 
-    void moveCharacter()
+    // Called each physics step
+    void FixedUpdate()
+    {
+        handleWalking();
+        handleJumping();
+        Vector3 forward = Rbody.transform.forward * RunMomentum * MovementSpeed * Time.deltaTime;
+        Vector3 jump = Rbody.transform.up * JumpMomentum * Time.deltaTime;
+
+        Vector3 gravity;
+        handleFalling(out gravity);
+
+        // move pos with forward, jump and gravity
+        Rbody.MovePosition(Rbody.position + forward + gravity + jump);
+    }
+
+    void handleFalling(out Vector3 gravity)
+    {
+        gravity = new Vector3();
+        const float EPSILON = 1E-4f;
+        float fallSpeed = -9.81f * Time.deltaTime * (FallMomentum++ / 100);
+
+        // Spherecasting
+        RaycastHit hit;
+        float dist = Mathf.Infinity;
+        if (Physics.SphereCast(Rbody.position + CapColl.center, CapColl.height / 2, -Rbody.transform.up, out hit, 100)) dist = hit.distance;
+        Grounded = (dist <= EPSILON) ? true : false;
+
+        if (Grounded)
+        {
+            Anim.SetBool("Grounded", true);
+            FallMomentum = 1;
+        } else {
+            Anim.SetBool("Grounded", false);
+            //if (dist < 0.4) Anim.SetBool("Grounded", true); // prepare landing animation a bit early
+
+            // Clipping check
+            if (dist < Mathf.Abs(fallSpeed)) 
+            {
+                gravity = new Vector3(0,-dist/2,0); // divide by half to help against clipping
+            } else 
+            {
+                gravity = new Vector3(0, fallSpeed, 0); // normal gravity
+            }
+        }
+
+        // Reset if jumped off arena
+        if (Rbody.position.y <= -10) Rbody.position = InitialStartPosition;
+    }
+
+    void handleJumping()
+    {
+        // only jump if grounded
+        if (Input.GetKey("space") && Grounded)
+        {
+            JumpMomentum = 22.0f;
+        } else
+        {
+            // decay jump momentum
+            updateMomentumWithinBounds(ref JumpMomentum, false, MomentumTypes.JumpMomentum);
+        }
+    }
+
+    void handleWalking()
+    {
+        // No WASD Input detected
+        if (Dir.x == 0 && Dir.y == 0 && Dir.z == 0) {
+            Anim.SetFloat("Speed", RunMomentum); // IDLE Animation
+            updateMomentumWithinBounds(ref RunMomentum, false, MomentumTypes.WalkMomentum); // lose momentum
+        } else 
+        {
+            // WASD Input detected - start running
+            updateMomentumWithinBounds(ref RunMomentum, true, MomentumTypes.WalkMomentum); // gain momentum
+
+            // apply rotation/forward transformation
+            Quaternion look = Quaternion.LookRotation(Dir);
+            Quaternion lookY = Quaternion.Euler(0, look.eulerAngles.y, 0); // only use y-axis for rotation
+            Rbody.MoveRotation(Quaternion.Lerp(Rbody.rotation, lookY, RotationSpeed));
+            Anim.SetFloat("Speed", RunMomentum); // Running animation
+        }
+    }
+
+    // *** Helper Functions ***
+
+    // update float with grow/decay factor withing respective bounds
+    void updateMomentumWithinBounds(ref float val, bool growing, MomentumTypes mType)
+    {
+        float growthFactor = 1.0f;
+        float decayFactor = 1.0f;
+
+        switch (mType)
+        {
+            case MomentumTypes.WalkMomentum:
+                growthFactor = 2.5f;
+                decayFactor = 3.8f;
+                break;
+            case MomentumTypes.JumpMomentum:
+                growthFactor = 15.8f;
+                decayFactor = 15.5f;
+                break;
+        }
+
+        if (growing)
+        {
+            val += growthFactor * Time.deltaTime;
+        } else 
+        {
+            val -= decayFactor * Time.deltaTime;
+        }
+
+        switch (mType)
+        {
+            case MomentumTypes.WalkMomentum:
+                val = Mathf.Clamp(val, 0.0f, 1.0f);
+                break;
+            case MomentumTypes.JumpMomentum:
+                val = Mathf.Clamp(val, 0.0f, 45.0f);
+                break;
+        }
+    }
+
+    Vector3 WASD_Dir()
     {
         Vector3 direction = new Vector3(0, 0, 0);
         GameObject cam = GameObject.Find("Main Camera");
@@ -32,42 +166,22 @@ public class SimpleCharacterControl : MonoBehaviour
         {
             direction = cam.transform.forward;
         }
-        else
 
         if (Input.GetKey("a"))
         {
-            direction = -cam.transform.right;
+            direction += -cam.transform.right;
         }
 
         if (Input.GetKey("s"))
         {
-            direction = -cam.transform.forward;
+            direction += -cam.transform.forward;
         }
 
         if (Input.GetKey("d"))
         {
-            direction = cam.transform.right;
+            direction += cam.transform.right;
         }
-
-        if (!(Input.GetKey("w") || Input.GetKey("s") || Input.GetKey("a") || Input.GetKey("d")) && isWalking == true) isWalking = false;
-
-        if (direction.x == 0) {
-            animator.Play("Idle");
-            return;
-        };
-
-        
-
-        Quaternion look = Quaternion.LookRotation(direction);
-        Quaternion lookY = Quaternion.Euler(0, look.eulerAngles.y, 0); // only use y-axis for rotation
-        transform.rotation = Quaternion.Lerp(transform.rotation, lookY, rotationSpeed);
-        transform.Translate(0, 0, movementSpeed * Time.deltaTime);
-
-        if (isWalking == false)
-        {
-            animator.Play("Walk");
-            isWalking = true;   
-        }
-        
+        direction.Normalize();
+        return direction;
     }
 }
