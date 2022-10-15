@@ -16,6 +16,7 @@ public class TipToePlatform : MonoBehaviour
     BoxCollider bCollider;
     public bool isPath;
     public Material defaultMaterial;
+    GameObject cube;
 
     //Variables Touched State
     public Material touchedMaterial;
@@ -29,6 +30,7 @@ public class TipToePlatform : MonoBehaviour
     void Start()
     {
         meshRend = GetComponent<MeshRenderer>();
+        cube = GetComponent<GameObject>();
         meshRend.material = defaultMaterial;
         bCollider = GetComponent<BoxCollider>();
     }
@@ -37,6 +39,7 @@ public class TipToePlatform : MonoBehaviour
     {
         if (state == State.Dead)
         {
+            return;
             //Count down timer until respawn of platform
             deadTimer -= Time.deltaTime;
             if (deadTimer <= 0.0f)
@@ -88,6 +91,16 @@ public class TipToePlatform : MonoBehaviour
                 meshRend.material = touchedMaterial;
             }
         }
+    }
 
+    public bool Dead()
+    {
+        bool touched = (this.state == State.Dead) ? true : false;
+        return touched;
+    }
+
+    public void SetPath(bool b)
+    {
+        isPath = b;
     }
 }

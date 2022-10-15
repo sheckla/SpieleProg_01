@@ -13,14 +13,17 @@ public class SimpleCharacterControl : MonoBehaviour
     public float MovementSpeed;     
 
     // Smoothed movement momentum vals
-    private float FallMomentum = 1;
+    public float FallMomentum = 1;
     enum MomentumTypes {WalkMomentum, JumpMomentum} // specifies decay/growth for smooth transitions
     public float RunMomentum = 0; 
     public float JumpMomentum = 0;
 
     private Vector3 InitialStartPosition;
     private Vector3 Dir;
-    private bool Grounded;
+    public bool Grounded;
+    public float Dist;
+
+    private bool JumpLockout;
 
     // Start is called before the first frame update
     void Start()
@@ -36,28 +39,31 @@ public class SimpleCharacterControl : MonoBehaviour
     {
         // get direction via. keyboard inputs [W,A,S,D]
         Dir = WASD_Dir();
+        handleJumping();
     }
 
     // Called each physics step
     void FixedUpdate()
     {
-        handleWalking();
+        handleJumping();
+        Vector3 gravity;
+        handleFalling(out gravity); 
+        handleWalkRotation();
         handleJumping();
         Vector3 forward = Rbody.transform.forward * RunMomentum * MovementSpeed * Time.deltaTime;
         Vector3 jump = Rbody.transform.up * JumpMomentum * Time.deltaTime;
 
-        Vector3 gravity;
-        handleFalling(out gravity);
 
         // move pos with forward, jump and gravity
-        Rbody.MovePosition(Rbody.position + forward + gravity + jump);
+        Rbody.MovePosition(Rbody.position + forward + gravity + jump); 
     }
 
     void handleFalling(out Vector3 gravity)
     {
         gravity = new Vector3();
-        const float EPSILON = 1E-4f;
-        float fallSpeed = -9.81f * Time.deltaTime * (FallMomentum++ / 100);
+        JumpLockout = false;
+        const float EPSILON = 1E-6f;
+        float fallSpeed = -9.81f * Time.deltaTime * (FallMomentum++ / 55);
 
         // Spherecasting
         RaycastHit hit;
@@ -65,23 +71,40 @@ public class SimpleCharacterControl : MonoBehaviour
         if (Physics.SphereCast(Rbody.position + CapColl.center, CapColl.height / 2, -Rbody.transform.up, out hit, 100)) dist = hit.distance;
         Grounded = (dist <= EPSILON) ? true : false;
 
+        Dist = dist;
+
         if (Grounded)
         {
             Anim.SetBool("Grounded", true);
+            Anim.speed = 1.0f;
             FallMomentum = 1;
-        } else {
-            Anim.SetBool("Grounded", false);
-            //if (dist < 0.4) Anim.SetBool("Grounded", true); // prepare landing animation a bit early
 
+            // Check Platform
+            TipToePlatform ttplat = hit.collider.GetComponent<TipToePlatform>();
+            if (ttplat) 
+            {
+                ttplat.CharacterTouches();
+                if (ttplat.Dead()) JumpLockout = true;
+            }
+
+            GameObject finish = GameObject.FindGameObjectWithTag("Finish");
+            if (finish == hit.collider.gameObject) 
+            {
+                finish.GetComponent<WinScript>().win();
+            }
+        } else {
+            Anim.SetBool("Grounded",false);
             // Clipping check
             if (dist < Mathf.Abs(fallSpeed)) 
             {
-                gravity = new Vector3(0,-dist/2,0); // divide by half to help against clipping
+                gravity = new Vector3(0,-dist/1.2f,0); // divide by factor to help against clipping
             } else 
             {
                 gravity = new Vector3(0, fallSpeed, 0); // normal gravity
             }
+
         }
+
 
         // Reset if jumped off arena
         if (Rbody.position.y <= -10) Rbody.position = InitialStartPosition;
@@ -90,9 +113,10 @@ public class SimpleCharacterControl : MonoBehaviour
     void handleJumping()
     {
         // only jump if grounded
-        if (Input.GetKey("space") && Grounded)
+        if (Input.GetKey("space") && Grounded && !JumpLockout)
         {
-            JumpMomentum = 22.0f;
+            JumpMomentum = 14.5f;
+            transform.position = Rbody.position;
         } else
         {
             // decay jump momentum
@@ -100,7 +124,7 @@ public class SimpleCharacterControl : MonoBehaviour
         }
     }
 
-    void handleWalking()
+    void handleWalkRotation()
     {
         // No WASD Input detected
         if (Dir.x == 0 && Dir.y == 0 && Dir.z == 0) {
@@ -120,7 +144,6 @@ public class SimpleCharacterControl : MonoBehaviour
     }
 
     // *** Helper Functions ***
-
     // update float with grow/decay factor withing respective bounds
     void updateMomentumWithinBounds(ref float val, bool growing, MomentumTypes mType)
     {
