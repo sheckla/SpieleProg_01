@@ -30,7 +30,7 @@ public class SimpleCharacterControl : MonoBehaviour
         //Debug.Log("" + isWalking);
         moveCharacter();
         //Debug.DrawRay(transform.position, new Vector3(0,-1.0f,0),Color.green);
-        Debug.Log(isGrounded());
+        //Debug.Log(isGrounded());
     }
 
     bool isGrounded(){
@@ -60,7 +60,7 @@ public class SimpleCharacterControl : MonoBehaviour
         GameObject cam = GameObject.Find("Main Camera");
 
         if(isGrounded()){
-
+            animator.SetBool("Grounded",true);
             isJumping=false;
 
             if (Input.GetKey("w"))
@@ -87,21 +87,23 @@ public class SimpleCharacterControl : MonoBehaviour
                 isJumping=true;
             }
             if (Input.GetKey("w") || Input.GetKey("s") || Input.GetKey("a") || Input.GetKey("d")){ 
-                changeSpeed(7.0f);
+                changeSpeed(10.0f);
             }
 
             animator.SetFloat("Speed",currentSpeed);
         }
         else
         {
+            animator.SetBool("Grounded",false);
             if(isJumping==false)animator.Play("Airborne");
             changeSpeed(-5.0f);
+            Debug.Log("AIRBORNE");
         }
 
         if (direction.x == 0 && isGrounded()) {changeSpeed(-12.0f);}
 
         if (direction.x == 0) {
-            Debug.Log("Speed: "+currentSpeed);
+            //Debug.Log("Speed: "+currentSpeed);
             transform.Translate(0, 0, currentSpeed * Time.deltaTime);
             return;
         };
@@ -111,7 +113,7 @@ public class SimpleCharacterControl : MonoBehaviour
         Quaternion lookY = Quaternion.Euler(0, look.eulerAngles.y, 0); // only use y-axis for rotation
         transform.rotation = Quaternion.Lerp(transform.rotation, lookY, rotationSpeed);
 
-        Debug.Log("Speed: "+currentSpeed);
+        //Debug.Log("Speed: "+currentSpeed);
         transform.Translate(0, 0, currentSpeed * Time.deltaTime); 
         
     }
