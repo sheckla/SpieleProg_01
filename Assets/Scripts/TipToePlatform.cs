@@ -39,7 +39,7 @@ public class TipToePlatform : MonoBehaviour
     {
         if (state == State.Dead)
         {
-            return;
+            return; // Ignore Dead-restore mechanics
             //Count down timer until respawn of platform
             deadTimer -= Time.deltaTime;
             if (deadTimer <= 0.0f)

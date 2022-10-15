@@ -4,28 +4,28 @@ using UnityEngine;
 
 public class SimpleCharacterControl : MonoBehaviour
 {
-    private Animator Anim;
-    private Rigidbody Rbody;
-    private CapsuleCollider CapColl;
-
+    // *** PUBLIC
     [SerializeField]
     public float RotationSpeed;
     public float MovementSpeed;     
 
     // Smoothed movement momentum vals
-    public float FallMomentum = 1;
-    enum MomentumTypes {WalkMomentum, JumpMomentum} // specifies decay/growth for smooth transitions
+    public float FallMomentum = 1; // normal 1-step increments/decrements
+    enum MomentumTypes {WalkMomentum, JumpMomentum} // specific decay/growth for smooth transitions
     public float RunMomentum = 0; 
     public float JumpMomentum = 0;
 
-    private Vector3 InitialStartPosition;
-    private Vector3 Dir;
-    public bool Grounded;
-    public float Dist;
+    // *** PRIVATE
+    private Animator Anim;
+    private Rigidbody Rbody;
+    private CapsuleCollider CapColl;
 
-    private bool JumpLockout;
+    private Vector3 InitialStartPosition; // for reseting to start
+    private Vector3 Dir; // global access for walking dir
+    private bool JumpLockout; // prevent jumping when standing on bait-platform
+    private bool Grounded;
 
-    // Start is called before the first frame update
+    // Before first frame - Initialisation
     void Start()
     {
         Anim = GetComponent<Animator>();
@@ -34,34 +34,32 @@ public class SimpleCharacterControl : MonoBehaviour
         InitialStartPosition = Rbody.position;
     }
 
-    // Called each Frame
+    // Each Frame
     void Update() 
     {
         // get direction via. keyboard inputs [W,A,S,D]
-        Dir = WASD_Dir();
-        handleJumping();
+        Dir = WASD_Dir(); // save cpu time by only calling each frame and not each Physics-Frame
     }
 
-    // Called each physics step
+    // Each Physics Step - [edit -> project_settings -> time- > fixed_timestep]
     void FixedUpdate()
     {
-        handleJumping();
-        Vector3 gravity;
-        handleFalling(out gravity); 
-        handleWalkRotation();
-        handleJumping();
-        Vector3 forward = Rbody.transform.forward * RunMomentum * MovementSpeed * Time.deltaTime;
-        Vector3 jump = Rbody.transform.up * JumpMomentum * Time.deltaTime;
+        Vector3 gravVec;
+        Vector3 runVec;
+        Vector3 jumpVec;
 
+        handleRunning(out runVec);
+        handleJumping(out jumpVec);
+        handleFalling(out gravVec); 
 
-        // move pos with forward, jump and gravity
-        Rbody.MovePosition(Rbody.position + forward + gravity + jump); 
+        // Transform Rigidbidy with Running, Jumping and Gravity Translation
+        Rbody.MovePosition(Rbody.position + (gravVec + runVec + jumpVec)); 
     }
 
     void handleFalling(out Vector3 gravity)
     {
-        gravity = new Vector3();
         JumpLockout = false;
+        gravity = new Vector3();
         const float EPSILON = 1E-6f;
         float fallSpeed = -9.81f * Time.deltaTime * (FallMomentum++ / 55);
 
@@ -71,29 +69,29 @@ public class SimpleCharacterControl : MonoBehaviour
         if (Physics.SphereCast(Rbody.position + CapColl.center, CapColl.height / 2, -Rbody.transform.up, out hit, 100)) dist = hit.distance;
         Grounded = (dist <= EPSILON) ? true : false;
 
-        Dist = dist;
-
         if (Grounded)
         {
             Anim.SetBool("Grounded", true);
-            Anim.speed = 1.0f;
-            FallMomentum = 1;
+            FallMomentum = 1; // reset Gravity momentum
 
             // Check Platform
             TipToePlatform ttplat = hit.collider.GetComponent<TipToePlatform>();
             if (ttplat) 
             {
                 ttplat.CharacterTouches();
-                if (ttplat.Dead()) JumpLockout = true;
+                if (ttplat.Dead()) JumpLockout = true; // prevent Jumping on already dead platform
             }
 
+            // Shiny sparkles when winning ;)
             GameObject finish = GameObject.FindGameObjectWithTag("Finish");
             if (finish == hit.collider.gameObject) 
             {
                 finish.GetComponent<WinScript>().win();
             }
+
         } else {
             Anim.SetBool("Grounded",false);
+
             // Clipping check
             if (dist < Mathf.Abs(fallSpeed)) 
             {
@@ -102,29 +100,26 @@ public class SimpleCharacterControl : MonoBehaviour
             {
                 gravity = new Vector3(0, fallSpeed, 0); // normal gravity
             }
-
         }
-
 
         // Reset if jumped off arena
         if (Rbody.position.y <= -10) Rbody.position = InitialStartPosition;
     }
 
-    void handleJumping()
+    void handleJumping(out Vector3 jumpVec)
     {
-        // only jump if grounded
         if (Input.GetKey("space") && Grounded && !JumpLockout)
         {
             JumpMomentum = 14.5f;
-            transform.position = Rbody.position;
         } else
         {
             // decay jump momentum
             updateMomentumWithinBounds(ref JumpMomentum, false, MomentumTypes.JumpMomentum);
         }
+        jumpVec = Rbody.transform.up * JumpMomentum * Time.deltaTime;
     }
 
-    void handleWalkRotation()
+    void handleRunning(out Vector3 runVec)
     {
         // No WASD Input detected
         if (Dir.x == 0 && Dir.y == 0 && Dir.z == 0) {
@@ -141,15 +136,19 @@ public class SimpleCharacterControl : MonoBehaviour
             Rbody.MoveRotation(Quaternion.Lerp(Rbody.rotation, lookY, RotationSpeed));
             Anim.SetFloat("Speed", RunMomentum); // Running animation
         }
+
+        runVec = Rbody.transform.forward * Time.deltaTime * RunMomentum * MovementSpeed;
     }
 
     // *** Helper Functions ***
-    // update float with grow/decay factor withing respective bounds
+    // update float with grow/decay factor within respective bounds
     void updateMomentumWithinBounds(ref float val, bool growing, MomentumTypes mType)
     {
+        // Defaults
         float growthFactor = 1.0f;
         float decayFactor = 1.0f;
 
+        // Assign specific Grow/Decay
         switch (mType)
         {
             case MomentumTypes.WalkMomentum:
@@ -161,15 +160,11 @@ public class SimpleCharacterControl : MonoBehaviour
                 decayFactor = 15.5f;
                 break;
         }
+        
+        // Grow/Decay
+        val = (growing) ? val += growthFactor * Time.deltaTime : val-= decayFactor * Time.deltaTime;
 
-        if (growing)
-        {
-            val += growthFactor * Time.deltaTime;
-        } else 
-        {
-            val -= decayFactor * Time.deltaTime;
-        }
-
+        // Clamp withing specific bounds
         switch (mType)
         {
             case MomentumTypes.WalkMomentum:
@@ -181,6 +176,7 @@ public class SimpleCharacterControl : MonoBehaviour
         }
     }
 
+    // Adds up multiple Keyboard inputs into Dir
     Vector3 WASD_Dir()
     {
         Vector3 direction = new Vector3(0, 0, 0);

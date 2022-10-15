@@ -4,20 +4,19 @@ using UnityEngine;
 
 public class TipToeLogic : MonoBehaviour
 {
-    [SerializeField] public GameObject platformPrefab;
-    private const int PlatformWidth = 10;
-    private const int PlatformDepth = 13;
+    // Public Offset Vals
     public float PlatformSpacing;
     public float TotalUnitWidth;
     public float TotalUnitDepth;
     public float xOffset;
     public float zOffset;
 
+    [SerializeField] public GameObject platformPrefab;
+    private const int PlatformWidth = 10;
+    private const int PlatformDepth = 13;
+
     private GameObject[,] platforms = new GameObject[PlatformWidth, PlatformDepth];
 
-    private float second;
-
-    // Start is called before the first frame update
     void Start()
     {
         for (int i = 0; i < PlatformWidth; i++)
@@ -57,6 +56,7 @@ public class TipToeLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        applyPlatformTransformations();
+        // Uncomment if adjusting Platform Matrix positions in Unity-Editor
+        //applyPlatformTransformations();
     }
 }
