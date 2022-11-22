@@ -36,11 +36,13 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\CharacterControlControls.cs" />
      <Compile Include="Assets\Scripts\TipToeLogic.cs" />
      <Compile Include="Assets\Scripts\TipToePlatform.cs" />
-     <Compile Include="Assets\Scripts\SimpleCharacterControl.cs" />
-     <Compile Include="Assets\Scripts\SimpleObjectCamera.cs" />
      <Compile Include="Assets\Scripts\WinScript.cs" />
+     <Compile Include="Assets\Scripts\SimpleCharacterControl.cs" />
+     <Compile Include="Assets\Scripts\PhysicsCharacterControls.cs" />
+     <Compile Include="Assets\Scripts\SimpleObjectCamera.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.11f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>

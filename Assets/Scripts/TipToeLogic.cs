@@ -31,6 +31,8 @@ public class TipToeLogic : MonoBehaviour
                platforms[i,j] = platform;
             }
         }
+
+        applyPlatformTransformations();
     }
 
     void applyPlatformTransformations()

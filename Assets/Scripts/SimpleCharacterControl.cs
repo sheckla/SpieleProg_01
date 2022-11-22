@@ -66,8 +66,8 @@ public class SimpleCharacterControl : MonoBehaviour
         // Spherecasting
         RaycastHit hit;
         float dist = Mathf.Infinity;
-        if (Physics.SphereCast(Rbody.position + CapColl.center, CapColl.height / 2, -Rbody.transform.up, out hit, 100)) dist = hit.distance;
-        Grounded = (dist <= EPSILON) ? true : false;
+        if (Physics.SphereCast(transform.position + transform.up, CapColl.radius, -transform.transform.up, out hit, 100)) dist = hit.distance;
+        Grounded = (dist <= CapColl.radius + 1E-6f) ? true : false;
 
         if (Grounded)
         {
