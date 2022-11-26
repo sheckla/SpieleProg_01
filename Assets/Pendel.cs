@@ -30,10 +30,10 @@ public class Pendel : MonoBehaviour
 
         if (goingForward)
         {
-            Rbody.AddForce(new Vector3(0,0, 10f));
+            Rbody.AddForce(new Vector3(0,0, 160f));
         } else 
         {
-            Rbody.AddForce(new Vector3(0,0, -10f));
+            Rbody.AddForce(new Vector3(0,0, -160f));
         }
     }
 }

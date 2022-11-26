@@ -15,7 +15,12 @@ public class RagdollController : MonoBehaviour
     private Collider[] Colliders;
     private CharacterJoint[] Joints;
 
+    private Vector3 initialRootPos;
+    private Vector3 initialRootRot;
+
     private bool Active = false;
+
+    public bool StaticActive;
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +28,22 @@ public class RagdollController : MonoBehaviour
         Rigidbodies = Armature.GetComponentsInChildren<Rigidbody>();
         Colliders = Armature.GetComponentsInChildren<Collider>();
         Joints = Armature.GetComponentsInChildren<CharacterJoint>();
+
+        initialRootPos = Armature.transform.localPosition;
+        initialRootRot = Armature.transform.localEulerAngles;
+
+        print(initialRootPos);
+        print(initialRootRot);
+    }
+
+    void Update() {
+        if (StaticActive) enable();    
+    }
+
+    public void applyArmatureRoot(Transform trans)
+    {
+        Armature.transform.localPosition = initialRootPos;
+        Armature.transform.localRotation = Quaternion.Euler(initialRootRot);
     }
 
 
@@ -68,7 +89,6 @@ public class RagdollController : MonoBehaviour
             joint.enableCollision = false;
         }
         Active = false;
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<SimpleObjectCamera>().smooth(false);
     }
 
     public void enable()
@@ -90,7 +110,6 @@ public class RagdollController : MonoBehaviour
             joint.enableCollision = true;
         }
         Active = true;
-        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<SimpleObjectCamera>().smooth(true);
     }
 
     public void applyForce(Vector3 forceDir, float impulse) 
