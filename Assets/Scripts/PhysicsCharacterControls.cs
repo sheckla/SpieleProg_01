@@ -5,17 +5,15 @@ using UnityEngine;
 public class PhysicsCharacterControls : MonoBehaviour
 {
     // Ragdoll
-    private Rigidbody[] Rigidbodies;
-    private Collider[] Colliders;
-    private CharacterJoint[] Joints;
-    public GameObject StandUpTarget;
+    private RagdollController RagdController;
 
-
+    // Character
     private Animator Anim;
     private Rigidbody Rbody;
     private CapsuleCollider CapCol;
     private GameObject Cam;
 
+    // Public
     public float TurnSmoothTime;
     public float Speed;
 
@@ -28,17 +26,13 @@ public class PhysicsCharacterControls : MonoBehaviour
     private float JumpingCooldown = 0;
     private float GravityFactor = 1;
     private float TurnSmoothVelocity;
-    private bool RootMotionApplied = false;
-    private int RootMotionAppliedIterations = 0;
-    private bool StandUpTargetSet = false;
+    private bool CurrentlyStandingUp = false;
+
+    public float RootMotionTimer = 0;
 
     void Start()
     {
-        // Get Ragdoll Components
-        GameObject Armature = GameObject.Find("Armature");
-        Rigidbodies = Armature.GetComponentsInChildren<Rigidbody>();
-        Colliders = Armature.GetComponentsInChildren<Collider>();
-        Joints = Armature.GetComponentsInChildren<CharacterJoint>();
+        RagdController = GetComponent<RagdollController>();
 
         // Get Character Components
         Anim = GetComponent<Animator>();
@@ -47,58 +41,15 @@ public class PhysicsCharacterControls : MonoBehaviour
         Cam = GameObject.Find("Main Camera");
 
         // Init
-        Physics.IgnoreLayerCollision(7, 6, true);
-        disableRagdoll();
-    }
-
-    void disableRagdoll()
-    {
-        foreach (Collider col in Colliders)
-        {
-            col.enabled = false;
-        }
-
-        foreach (Rigidbody rbody in Rigidbodies)
-        {
-            rbody.isKinematic = true;
-            rbody.detectCollisions = false;
-        }
-
-        foreach (CharacterJoint joint in Joints)
-        {
-            joint.enableCollision = false;
-        }
-        Standing = true;
-    }
-
-    void enableRagdoll()
-    {
-        foreach (Collider col in Colliders)
-        {
-            col.enabled = true;
-        }
-
-        foreach (Rigidbody rbody in Rigidbodies)
-        {
-            rbody.isKinematic = false;
-            rbody.detectCollisions = true;
-            Rigidbody targetRbody = StandUpTarget.GetComponent<Rigidbody>();
-            targetRbody.AddForce(Rbody.velocity);
-            rbody.useGravity = true;
-        }
-
-        foreach (CharacterJoint joint in Joints)
-        {
-            joint.enableCollision = true;
-        }
-        Standing = false;
+        Physics.IgnoreLayerCollision(7, 6, true); // Disable Rigidbody and Ragdoll Collisions
+        RagdController.disable();
     }
 
     // each Frame
     private void Update() {
 
         // Ragdoll / Animator interaction
-        Anim.enabled = (Standing) ? true : false;
+        Anim.enabled = (Standing || CurrentlyStandingUp) ? true : false;
 
         // Player Input
         inputAxisDir(ref AxisDir);
@@ -106,30 +57,24 @@ public class PhysicsCharacterControls : MonoBehaviour
 
     // Once per physics step
     private void FixedUpdate() {
-        handleStandingUp();
         handleFalling();
-        if (Standing) handleRunning();
-        applyRootMotionIterations();
+        handleStandingUp();
+        handleRunning();
+
+        if (Input.GetKey("e"))
+        {
+            Standing = false;
+            Anim.enabled = false;
+            RagdController.enable();
+            RagdController.applyForce(new Vector3(0f,1f,0), 10);
+        }
+
         Anim.SetBool("Standing", Standing);
         Anim.SetBool("Grounded", Grounded);
         Anim.SetFloat("Speed", AnimSpeedVal);
     }
 
-    private void applyRootMotionIterations()
-    {
-        // Apply Root Motion several times after standing up
-        if (Standing && !RootMotionApplied && RootMotionAppliedIterations < 20)
-        {
-            Anim.applyRootMotion = true;
-            RootMotionApplied = true;
-            RootMotionAppliedIterations++;
-        } else 
-        {
-            Anim.applyRootMotion = false;
-            RootMotionAppliedIterations = 0;
-        }
-
-    }
+ 
 
     private Vector3 inputAxisDir(ref Vector3 vec)
     {
@@ -142,51 +87,61 @@ public class PhysicsCharacterControls : MonoBehaviour
 
     private void handleStandingUp()
     {
-        // Stand up
-        if (!Standing && StandingUpTimer >= 3)
-        {
-                foreach (Rigidbody rbody in Rigidbodies)
-            {
-                rbody.isKinematic = true;
-            }
-            lockRigidbodyConstraints();
 
-            if (!StandUpTargetSet) 
-            {
-            BoxCollider col = StandUpTarget.GetComponent<BoxCollider>();
-            Rbody.position = StandUpTarget.transform.position;
-            Rbody.rotation = StandUpTarget.transform.rotation;
-            StandUpTargetSet = true;
-            }
+        // Character Rigidbody follow Ragdoll Torso
+        if (!Standing && !CurrentlyStandingUp)
+        {
+            BoxCollider col = RagdController.torsoBoxCollider();
+            CapsuleCollider[] cols = RagdController.feetCollider();
+            Vector3 pos1 = cols[0].transform.position;
+            Vector3 pos2 = cols[1].transform.position;
+            Rbody.position = Vector3.Lerp(Rbody.position, pos1 + (pos2 - pos1) * 0.5f, 0.21f);
+            Rbody.rotation = Quaternion.Euler(col.transform.eulerAngles);
+            Rbody.isKinematic = true;
+            Rbody.detectCollisions = false;
+        }
+
+        // Character currently in falling motion
+        StandingUpTimer = (!Standing && RagdController.torsoVelocity() <= 0.5f) ? StandingUpTimer += Time.deltaTime : StandingUpTimer = 0;
+
+        // Stand up if timer reached
+        if (StandingUpTimer >= 3)
+        {
+            Anim.applyRootMotion = true;
+            CurrentlyStandingUp = true;
+            Rbody.isKinematic = false;
+            Rbody.detectCollisions = true;
 
             // keep y rotation while standing up
             Quaternion endRotation = new Quaternion(0f, transform.rotation.y, 0f, transform.rotation.w); 
-            transform.rotation = Quaternion.Lerp(transform.rotation, endRotation, Time.deltaTime * 3.5f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, endRotation, Time.deltaTime * 5.5f);
+
+            // Play Standing Up Animation
+            Anim.Play("Standing_Up_Exit");
+            if (RagdController.active()) RagdController.disable();
 
             // Standing Up End-state
             if (transform.rotation == endRotation) {
                 StandingUpTimer = 0;
                 Standing = true;
-                disableRagdoll();
-                RootMotionApplied = false;
-                StandUpTargetSet = false;
+                CurrentlyStandingUp = false;
+                Anim.applyRootMotion = false;
             }
-        } else
-        {
-            // Character currently in falling motion
-            StandingUpTimer = (!Standing && Rbody.velocity.magnitude <= 0.9f) ? StandingUpTimer += Time.deltaTime : StandingUpTimer = 0;
-        }
-
-
-
+        } 
     }
 
     // *** Input, Rotation & Running ***
     private void handleRunning()
     {
+
+        if (!Standing)
+        {
+            incrementFloatWithinBounds(ref AnimSpeedVal, 0, 1, -0.02f);
+            return;
+        }
+
         // Sprinting
         CurrentMovementSpeed = (Input.GetKey("left shift")) ? Speed * 2.3f : Speed;
-
         if (AxisDir.magnitude >= 0.1f)
         {
             // atan2(x, z) gives angle between vector(x,z), Cam Rotation is on y
@@ -200,8 +155,7 @@ public class PhysicsCharacterControls : MonoBehaviour
             Rbody.AddForce(moveDir * CurrentMovementSpeed);
 
             incrementFloatWithinBounds(ref AnimSpeedVal, 0, 1, 0.02f);
-        } else
-        {
+        } else {
             incrementFloatWithinBounds(ref AnimSpeedVal, 0, 1, -0.02f);
         }
     }
@@ -238,8 +192,7 @@ public class PhysicsCharacterControls : MonoBehaviour
         float groundAngle = Mathf.Acos(Vector3.Dot(hit.normal, transform.up)) * Mathf.Rad2Deg;
         if (Grounded && groundAngle > 45)
         {
-            freeRigidbodyConstraints();
-            enableRagdoll();
+            RagdController.enable();
             Standing = false;
         }
     }
@@ -247,23 +200,16 @@ public class PhysicsCharacterControls : MonoBehaviour
     // Checks Collisions for ParcourObjects
     // If Impulse great enough -> Ragdoll
     private void OnCollisionEnter(Collision other) {
-        print("Collision with" + other.gameObject.tag + ", impulse=" + other.impulse.magnitude);
-        if (other.gameObject.CompareTag("ParcourObject") && other.impulse.magnitude >= 20)
+        Rigidbody r = other.rigidbody;
+        if (r == null) return;
+        print("Collision with" + other.gameObject.tag + ", impulse=" + other.impulse.magnitude * other.rigidbody.mass);
+        if (other.gameObject.CompareTag("ParcourObject") && other.impulse.magnitude * other.rigidbody.mass >= 100)
         {
-            freeRigidbodyConstraints();
-            enableRagdoll();
+            //freeRigidbodyConstraints();
+            if (!RagdController.active()) RagdController.enable();
+            RagdController.applyForce(-Rbody.velocity.normalized, other.impulse.magnitude);
             Standing = false;
         }
-    }
-
-    private void freeRigidbodyConstraints()
-    {
-        Rbody.constraints = RigidbodyConstraints.None;
-    }
-
-    private void lockRigidbodyConstraints()
-    {
-        Rbody.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
     private float incrementFloatWithinBounds(ref float val, float min, float max, float fac)
@@ -274,3 +220,17 @@ public class PhysicsCharacterControls : MonoBehaviour
         return val;
     }
 }
+
+
+/* Standing up rotation
+// keep y rotation while standing up
+            Quaternion endRotation = new Quaternion(0f, transform.rotation.y, 0f, transform.rotation.w); 
+            transform.rotation = Quaternion.Lerp(transform.rotation, endRotation, Time.deltaTime * 3.5f);
+
+            // Standing Up End-state
+            if (transform.rotation == endRotation) {
+                StandingUpTimer = 0;
+                Standing = true;
+                RagdController.disable();
+            }
+            */

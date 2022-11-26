@@ -38,6 +38,8 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\CharacterControlControls.cs" />
      <Compile Include="Assets\Scripts\TipToeLogic.cs" />
+     <Compile Include="Assets\Pendel.cs" />
+     <Compile Include="Assets\Scripts\RagdollController.cs" />
      <Compile Include="Assets\Scripts\TipToePlatform.cs" />
      <Compile Include="Assets\Scripts\WinScript.cs" />
      <Compile Include="Assets\Scripts\SimpleCharacterControl.cs" />

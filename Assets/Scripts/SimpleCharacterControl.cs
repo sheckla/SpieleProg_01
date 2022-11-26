@@ -203,4 +203,5 @@ public class SimpleCharacterControl : MonoBehaviour
         direction.Normalize();
         return direction;
     }
+    
 }
