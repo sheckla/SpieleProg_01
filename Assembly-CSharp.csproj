@@ -38,7 +38,9 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\CharacterControlControls.cs" />
      <Compile Include="Assets\Scripts\TipToeLogic.cs" />
+     <Compile Include="Assets\UI\SelectableButton.cs" />
      <Compile Include="Assets\Pendel.cs" />
+     <Compile Include="Assets\MainMenu.cs" />
      <Compile Include="Assets\Scripts\RagdollController.cs" />
      <Compile Include="Assets\Scripts\TipToePlatform.cs" />
      <Compile Include="Assets\Scripts\WinScript.cs" />
@@ -725,6 +727,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{9f7caa76-cdb8-0d25-b30b-e3d66cc63443}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -15,11 +15,10 @@ public class RagdollController : MonoBehaviour
     private Collider[] Colliders;
     private CharacterJoint[] Joints;
 
-    private Vector3 initialRootPos;
-    private Vector3 initialRootRot;
+    private Vector3 ArmatureInitialRootPos;
+    private Vector3 ArmatureInitialRootRot;
 
     private bool Active = false;
-
     public bool StaticActive;
 
     // Start is called before the first frame update
@@ -29,21 +28,18 @@ public class RagdollController : MonoBehaviour
         Colliders = Armature.GetComponentsInChildren<Collider>();
         Joints = Armature.GetComponentsInChildren<CharacterJoint>();
 
-        initialRootPos = Armature.transform.localPosition;
-        initialRootRot = Armature.transform.localEulerAngles;
-
-        print(initialRootPos);
-        print(initialRootRot);
+        ArmatureInitialRootPos = Armature.transform.localPosition;
+        ArmatureInitialRootRot = Armature.transform.localEulerAngles;
     }
 
     void Update() {
         if (StaticActive) enable();    
     }
 
-    public void applyArmatureRoot(Transform trans)
+    public void applyArmatureRoot()
     {
-        Armature.transform.localPosition = initialRootPos;
-        Armature.transform.localRotation = Quaternion.Euler(initialRootRot);
+        Armature.transform.localPosition = ArmatureInitialRootPos;
+        Armature.transform.localRotation = Quaternion.Euler(ArmatureInitialRootRot);
     }
 
 

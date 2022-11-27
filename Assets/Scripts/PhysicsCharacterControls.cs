@@ -104,7 +104,6 @@ public class PhysicsCharacterControls : MonoBehaviour
             RagdController.enable();
             RagdController.applyForce(-Rbody.velocity.normalized, Rbody.velocity.magnitude);
         }
-
     }
 
  
@@ -144,7 +143,7 @@ public class PhysicsCharacterControls : MonoBehaviour
             CurrentlyStandingUp = true;
             Rbody.isKinematic = false;
             Rbody.detectCollisions = true;
-            RagdController.applyArmatureRoot(null);
+            RagdController.applyArmatureRoot();
 
             // keep y rotation while standing up
             Quaternion endRotation = new Quaternion(0f, transform.rotation.y, 0f, transform.rotation.w); 
@@ -160,7 +159,7 @@ public class PhysicsCharacterControls : MonoBehaviour
                 Standing = true;
                 CurrentlyStandingUp = false;
                 Anim.applyRootMotion = false;
-                Quaternion xRot = Quaternion.Euler(-90f, transform.rotation.y, transform.rotation.z);
+                RagdController.applyArmatureRoot();
             }
         } 
 
