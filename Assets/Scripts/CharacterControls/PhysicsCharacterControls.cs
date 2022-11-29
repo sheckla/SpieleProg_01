@@ -106,8 +106,6 @@ public class PhysicsCharacterControls : MonoBehaviour
         }
     }
 
- 
-
     private Vector3 inputAxisDir(ref Vector3 vec)
     {
         // Inputs as int [0 | 1]
@@ -179,7 +177,7 @@ public class PhysicsCharacterControls : MonoBehaviour
         MovementSpeedFactor = (Input.GetKey("left shift")) ? Speed * 2.3f : Speed;
         if (AxisDir.magnitude >= MIN_ANIMATION_SPEED_VALUE)
         {
-            // atan2(x, z) gives angle between vector(x,z), Cam Rotation is on y
+            // atan2(x, z) gives angle between vector(x,z) [-pi, pi], Cam Rotation is on y
             float targetAngle = (Mathf.Atan2(AxisDir.x, AxisDir.z) * Mathf.Rad2Deg) + Cam.transform.eulerAngles.y;
 
             // Smooth Rotation
