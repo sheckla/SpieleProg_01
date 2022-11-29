@@ -36,17 +36,17 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\CharacterControlControls.cs" />
-     <Compile Include="Assets\Scripts\TipToeLogic.cs" />
-     <Compile Include="Assets\UI\SelectableButton.cs" />
-     <Compile Include="Assets\Pendel.cs" />
-     <Compile Include="Assets\MainMenu.cs" />
-     <Compile Include="Assets\Scripts\RagdollController.cs" />
-     <Compile Include="Assets\Scripts\TipToePlatform.cs" />
-     <Compile Include="Assets\Scripts\WinScript.cs" />
-     <Compile Include="Assets\Scripts\SimpleCharacterControl.cs" />
-     <Compile Include="Assets\Scripts\PhysicsCharacterControls.cs" />
-     <Compile Include="Assets\Scripts\SimpleObjectCamera.cs" />
+     <Compile Include="Assets\Scripts\CharacterControls\CharacterControlControls.cs" />
+     <Compile Include="Assets\Scripts\Praktikum01\TipToeLogic.cs" />
+     <Compile Include="Assets\UI\Components\MenuButton\SelectableButton.cs" />
+     <Compile Include="Assets\Scripts\Models\Pendel.cs" />
+     <Compile Include="Assets\Scripts\UIController\MainMenu.cs" />
+     <Compile Include="Assets\Scripts\Ragdoll\RagdollController.cs" />
+     <Compile Include="Assets\Scripts\Praktikum01\TipToePlatform.cs" />
+     <Compile Include="Assets\Scripts\Praktikum01\WinScript.cs" />
+     <Compile Include="Assets\Scripts\CharacterControls\SimpleCharacterControl.cs" />
+     <Compile Include="Assets\Scripts\CharacterControls\PhysicsCharacterControls.cs" />
+     <Compile Include="Assets\Scripts\Camera\SimpleObjectCamera.cs" />
     <Reference Include="UnityEngine">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.11f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
