@@ -20,6 +20,8 @@ half4 _MainTex_ST;
 sampler2D _FurTex;
 half4 _FurTex_ST;
 
+sampler2D _Fur_Alpha;
+
 fixed _FurLength;
 fixed _FurDensity;
 fixed _FurThinness;
@@ -42,6 +44,7 @@ v2f vert_surface(appdata_base v)
 v2f vert_base(appdata_base v)
 {
     v2f o;
+
     float3 P = v.vertex.xyz + v.normal * _FurLength * FURSTEP;
     P += clamp(mul(unity_WorldToObject, _ForceGlobal).xyz + _ForceLocal.xyz, -1, 1) * pow(FURSTEP, 3) * _FurLength;
     o.pos = UnityObjectToClipPos(float4(P, 1.0));
@@ -67,6 +70,8 @@ fixed4 frag_surface(v2f i): SV_Target
     fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(worldNormal, worldHalf)), _Shininess);
 
     fixed3 color = ambient + diffuse + specular;
+
+    if(/*!((tex2D(_Fur_Alpha,i.uv.xy).r == 0) && (tex2D(_Fur_Alpha,i.uv.xy).g == 0) && (tex2D(_Fur_Alpha,i.uv.xy).b == 0)) */(tex2D(_Fur_Alpha,i.uv.xy).a != 0))color = tex2D(_Fur_Alpha,i.uv.xy).rgb;
     
     return fixed4(color, 1.0);
 }
@@ -87,6 +92,7 @@ fixed4 frag_base(v2f i): SV_Target
 
     fixed3 color = ambient + diffuse + specular;
     fixed3 noise = tex2D(_FurTex, i.uv.zw * _FurThinness).rgb;
+    if(/*!((tex2D(_Fur_Alpha,i.uv.xy).r == 0) && (tex2D(_Fur_Alpha,i.uv.xy).g == 0) && (tex2D(_Fur_Alpha,i.uv.xy).b == 0)) */ (tex2D(_Fur_Alpha,i.uv.xy).a != 0))noise = (0,0,0);
     fixed alpha = clamp(noise - (FURSTEP * FURSTEP) * _FurDensity, 0, 1);
     
     return fixed4(color, alpha);
