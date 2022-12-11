@@ -9,6 +9,7 @@ public class TipToePlatform : MonoBehaviour
         Default,
         Touched,
         Dead,
+        Desolving,
     }
 
     State state = State.Default;
@@ -20,8 +21,13 @@ public class TipToePlatform : MonoBehaviour
 
     //Variables Touched State
     public Material touchedMaterial;
+
+    public Material desolveMaterial;
+
     float touchedTimer = 0.0f;
     public float maxTouchedTime = 5.0f;
+
+    public float desolveTime = 1.0f;
 
     //Variables Dead State
     float deadTimer = 0.0f;
@@ -37,9 +43,29 @@ public class TipToePlatform : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(desolveTime);
+        Debug.Log(state);
+
+        if(state==State.Desolving){
+            if(desolveTime <= 0.0){
+                deadTimer = maxDeadTime;
+                meshRend.enabled = false;
+                bCollider.enabled = false;
+                state = State.Dead;
+                desolveTime = 1.0f;
+            }else{
+                meshRend.material = desolveMaterial;
+                desolveMaterial.SetFloat("_Threshold",desolveTime);
+
+                desolveTime-=Time.deltaTime;
+            }
+        }
+
+
+
         if (state == State.Dead)
         {
-            return; // Ignore Dead-restore mechanics
+            //return; // Ignore Dead-restore mechanics
             //Count down timer until respawn of platform
             deadTimer -= Time.deltaTime;
             if (deadTimer <= 0.0f)
@@ -64,6 +90,10 @@ public class TipToePlatform : MonoBehaviour
         }
     }
 
+   void OnCollisionEnter(Collision col){
+        CharacterTouches();
+   }
+
     private void ChangeState(State s)
     {
         state = s;
@@ -73,10 +103,19 @@ public class TipToePlatform : MonoBehaviour
     {
         if (!isPath)
         {
-            ChangeState(State.Dead);
-            deadTimer = maxDeadTime;
-            meshRend.enabled = false;
-            bCollider.enabled = false;
+            ChangeState(State.Desolving);
+            //HERE
+            /*
+            if(desolveTime <= 0.0){
+                deadTimer = maxDeadTime;
+                meshRend.enabled = false;
+                bCollider.enabled = false;
+                desolveTime = 5.0f;
+            }else{
+                desolveTime-=Time.deltaTime;
+            }
+            */
+            
         }
         else
         {
