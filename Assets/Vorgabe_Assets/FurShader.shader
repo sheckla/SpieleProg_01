@@ -8,6 +8,8 @@
         
         _MainTex ("Texture", 2D) = "white" { }
         _FurTex ("Fur Pattern", 2D) = "white" { }
+
+        _Fur_Alpha ("Texture mit Alpha", 2D) = "white" { }
         
         _FurLength ("Fur Length", Range(0.0, 1)) = 0.5
         _FurDensity ("Fur Density", Range(0, 2)) = 0.11

@@ -36,17 +36,28 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\CharacterControls\CharacterControlControls.cs" />
-     <Compile Include="Assets\Scripts\Praktikum01\TipToeLogic.cs" />
-     <Compile Include="Assets\UI\Components\MenuButton\SelectableButton.cs" />
-     <Compile Include="Assets\Scripts\Models\Pendel.cs" />
-     <Compile Include="Assets\Scripts\UIController\MainMenu.cs" />
-     <Compile Include="Assets\Scripts\Ragdoll\RagdollController.cs" />
-     <Compile Include="Assets\Scripts\Praktikum01\TipToePlatform.cs" />
-     <Compile Include="Assets\Scripts\Praktikum01\WinScript.cs" />
-     <Compile Include="Assets\Scripts\CharacterControls\SimpleCharacterControl.cs" />
-     <Compile Include="Assets\Scripts\CharacterControls\PhysicsCharacterControls.cs" />
-     <Compile Include="Assets\Scripts\Camera\SimpleObjectCamera.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansDecalTools.cs" />
+     <Compile Include="Assets\Scripts\CharacterControlControls.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansMatertialUtils.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansPostProcess.cs" />
+     <Compile Include="Assets\Scripts\TipToeLogic.cs" />
+     <Compile Include="Assets\UI\SelectableButton.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansImporter.cs" />
+     <Compile Include="Assets\Pendel.cs" />
+     <Compile Include="Assets\MainMenu.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansImporterWindow.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansTextureProcessor.cs" />
+     <Compile Include="Assets\Scripts\RagdollController.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansUtilities.cs" />
+     <Compile Include="Assets\Scripts\TipToePlatform.cs" />
+     <Compile Include="Assets\Scripts\WinScript.cs" />
+     <Compile Include="Assets\Scripts\SimpleCharacterControl.cs" />
+     <Compile Include="Assets\UnityPackages\JsonNetSample\JsonNetSample.cs" />
+     <Compile Include="Assets\Scripts\PhysicsCharacterControls.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansTerrainTools.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansMeshUtils.cs" />
+     <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansBridgeLink.cs" />
+     <Compile Include="Assets\Scripts\SimpleObjectCamera.cs" />
      <None Include="Assets\Vorgabe_Assets\FurHelper.cginc" />
      <None Include="Assets\Vorgabe_Assets\FurShader.shader" />
      <None Include="Assets\Shader\Desolve_Shader.shader" />
@@ -671,23 +682,11 @@
     <Reference Include="Unity.VSCode.Editor">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core.Analytics">
-        <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Shared.Editor">
-        <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core.Environments">
-        <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.Services.Core.Environments.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Timeline.Editor">
-        <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
@@ -704,8 +703,8 @@
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.Flow">
-        <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
+    <Reference Include="Unity.Postprocessing.Editor">
+        <HintPath>G:\Unity\Spieleprog\SpieleProg_01\Library\ScriptAssemblies\Unity.Postprocessing.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
@@ -716,14 +715,14 @@
     <Reference Include="Unity.Rider.Editor">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.VisualScripting.Flow">
+        <HintPath>G:\Unity\Spieleprog\SpieleProg_01\Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Services.Core">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.State">
-        <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Core">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
@@ -733,6 +732,24 @@
     </Reference>
     <Reference Include="Unity.Postprocessing.Runtime">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Analytics">
+        <HintPath>G:\Unity\Spieleprog\SpieleProg_01\Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Postprocessing.Runtime">
+        <HintPath>G:\Unity\Spieleprog\SpieleProg_01\Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Shared.Editor">
+        <HintPath>G:\Unity\Spieleprog\SpieleProg_01\Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Services.Core.Environments">
+        <HintPath>G:\Unity\Spieleprog\SpieleProg_01\Library\ScriptAssemblies\Unity.Services.Core.Environments.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Timeline.Editor">
+        <HintPath>G:\Unity\Spieleprog\SpieleProg_01\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.State">
+        <HintPath>G:\Unity\Spieleprog\SpieleProg_01\Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
