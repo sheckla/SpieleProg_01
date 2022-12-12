@@ -6,7 +6,7 @@ public class WinScript : MonoBehaviour
 {
      public ParticleSystem particles;
 
-    // Start is called before the first frame update
+    // Start is called before the first frame update 13/40  10/30
     void Start()
     {
         particles.Stop();
