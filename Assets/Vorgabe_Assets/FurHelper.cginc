@@ -71,7 +71,8 @@ fixed4 frag_surface(v2f i): SV_Target
 
     fixed3 color = ambient + diffuse + specular;
 
-    if(/*!((tex2D(_Fur_Alpha,i.uv.xy).r == 0) && (tex2D(_Fur_Alpha,i.uv.xy).g == 0) && (tex2D(_Fur_Alpha,i.uv.xy).b == 0)) */(tex2D(_Fur_Alpha,i.uv.xy).a != 0))color = tex2D(_Fur_Alpha,i.uv.xy).rgb;
+    //if(/*!((tex2D(_Fur_Alpha,i.uv.xy).r == 0) && (tex2D(_Fur_Alpha,i.uv.xy).g == 0) && (tex2D(_Fur_Alpha,i.uv.xy).b == 0)) */(tex2D(_Fur_Alpha,i.uv.xy).a != 0))color = tex2D(_Fur_Alpha,i.uv.xy).rgb;
+    if(tex2D(_Fur_Alpha,i.uv.xy).a != 0)color = tex2D(_Fur_Alpha,i.uv.xy).rgb;
     
     return fixed4(color, 1.0);
 }
@@ -92,7 +93,8 @@ fixed4 frag_base(v2f i): SV_Target
 
     fixed3 color = ambient + diffuse + specular;
     fixed3 noise = tex2D(_FurTex, i.uv.zw * _FurThinness).rgb;
-    if(/*!((tex2D(_Fur_Alpha,i.uv.xy).r == 0) && (tex2D(_Fur_Alpha,i.uv.xy).g == 0) && (tex2D(_Fur_Alpha,i.uv.xy).b == 0)) */ (tex2D(_Fur_Alpha,i.uv.xy).a != 0))noise = (0,0,0);
+    //if(/*!((tex2D(_Fur_Alpha,i.uv.xy).r == 0) && (tex2D(_Fur_Alpha,i.uv.xy).g == 0) && (tex2D(_Fur_Alpha,i.uv.xy).b == 0)) */ (tex2D(_Fur_Alpha,i.uv.xy).a != 0))noise = (0,0,0);
+    if (tex2D(_Fur_Alpha,i.uv.xy).a != 0) noise = (0,0,0);
     fixed alpha = clamp(noise - (FURSTEP * FURSTEP) * _FurDensity, 0, 1);
     
     return fixed4(color, alpha);

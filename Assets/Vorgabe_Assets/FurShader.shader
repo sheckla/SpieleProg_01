@@ -1,4 +1,8 @@
-﻿Shader "Fur/FurForceShader"
+﻿// Furstep [0, 1], 0.05 Steps = 20 Steps total! Expensive Shader
+//      20 Steps per Fragment
+
+
+Shader "Fur/FurForceShader"
 {
     Properties
     {
@@ -18,6 +22,7 @@
 
         _ForceGlobal ("Force Global", Vector) = (0, 0, 0, 0)
         _ForceLocal ("Force Local", Vector) = (0, 0, 0, 0)
+        _FurScale ("Fur Scale", Range(0.0, 1.0)) = 0.0
     }
     
     Category

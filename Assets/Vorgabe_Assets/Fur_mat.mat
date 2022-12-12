@@ -75,7 +75,8 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _FurDensity: 0.84
-    - _FurLength: 0.002
+    - _FurLength: 0.001
+    - _FurScale: 0
     - _FurShading: 0.097
     - _FurThinness: 6.33
     - _GlossMapScale: 1
