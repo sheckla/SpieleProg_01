@@ -30,6 +30,7 @@ fixed _FurShading;
 float4 _ForceGlobal;
 float4 _ForceLocal;
 
+// Standrad transformations, preparation for Phong-Shading
 v2f vert_surface(appdata_base v)
 {
     v2f o;
@@ -41,6 +42,7 @@ v2f vert_surface(appdata_base v)
     return o;
 }
 
+// Like vert_surface, but vertex is lengthened by FurLength (in relation to current FURSTEP)
 v2f vert_base(appdata_base v)
 {
     v2f o;
@@ -56,27 +58,29 @@ v2f vert_base(appdata_base v)
     return o;
 }
 
+// calculate color the surface of the object | Standard Phong shenanigans
 fixed4 frag_surface(v2f i): SV_Target
 {
-    
-    fixed3 worldNormal = normalize(i.worldNormal);
-    fixed3 worldLight = normalize(_WorldSpaceLightPos0.xyz);
-    fixed3 worldView = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);
-    fixed3 worldHalf = normalize(worldView + worldLight);
+    // world-vectors
+    fixed3 worldNormal = normalize(i.worldNormal); // FragNormal
+    fixed3 worldLight = normalize(_WorldSpaceLightPos0.xyz); // LightPos
+    fixed3 worldView = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz); // fragPos -> CameraPos
+    fixed3 worldHalf = normalize(worldView + worldLight); // Half Vector between (fragPos -> CameraPos) & LightPos
 
-    fixed3 albedo = tex2D(_MainTex, i.uv.xy).rgb * _Color;
+    fixed3 albedo = tex2D(_MainTex, i.uv.xy).rgb * _Color; // Fur Texture
+    // Standard Phong
     fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
     fixed3 diffuse = _LightColor0.rgb * albedo * saturate(dot(worldNormal, worldLight));
     fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(worldNormal, worldHalf)), _Shininess);
 
     fixed3 color = ambient + diffuse + specular;
 
-    //if(/*!((tex2D(_Fur_Alpha,i.uv.xy).r == 0) && (tex2D(_Fur_Alpha,i.uv.xy).g == 0) && (tex2D(_Fur_Alpha,i.uv.xy).b == 0)) */(tex2D(_Fur_Alpha,i.uv.xy).a != 0))color = tex2D(_Fur_Alpha,i.uv.xy).rgb;
     if(tex2D(_Fur_Alpha,i.uv.xy).a != 0)color = tex2D(_Fur_Alpha,i.uv.xy).rgb;
     
     return fixed4(color, 1.0);
 }
 
+// Frag Color of actual "fur"
 fixed4 frag_base(v2f i): SV_Target
 {
     fixed3 worldNormal = normalize(i.worldNormal);
@@ -85,17 +89,16 @@ fixed4 frag_base(v2f i): SV_Target
     fixed3 worldHalf = normalize(worldView + worldLight);
 
     fixed3 albedo = tex2D(_MainTex, i.uv.xy).rgb * _Color;
-    albedo -= (pow(1 - FURSTEP, 3)) * _FurShading;
+    albedo -= (pow(1 - FURSTEP, 3)) * _FurShading; // fur get's more light as the max FurLength gets reached
 
     fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
     fixed3 diffuse = _LightColor0.rgb * albedo * saturate(dot(worldNormal, worldLight));
     fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(worldNormal, worldHalf)), _Shininess);
 
     fixed3 color = ambient + diffuse + specular;
-    fixed3 noise = tex2D(_FurTex, i.uv.zw * _FurThinness).rgb;
-    //if(/*!((tex2D(_Fur_Alpha,i.uv.xy).r == 0) && (tex2D(_Fur_Alpha,i.uv.xy).g == 0) && (tex2D(_Fur_Alpha,i.uv.xy).b == 0)) */ (tex2D(_Fur_Alpha,i.uv.xy).a != 0))noise = (0,0,0);
+    fixed3 noise = tex2D(_FurTex, i.uv.zw * _FurThinness).rgb; // Additional Noise is added
     if (tex2D(_Fur_Alpha,i.uv.xy).a != 0) noise = (0,0,0);
-    fixed alpha = clamp(noise - (FURSTEP * FURSTEP) * _FurDensity, 0, 1);
+    fixed alpha = clamp(noise - (FURSTEP * FURSTEP) * _FurDensity, 0, 1); // Alpha is clamped by current FurStep and Furdensity
     
     return fixed4(color, alpha);
 }
