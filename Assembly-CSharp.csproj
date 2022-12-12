@@ -52,12 +52,12 @@
      <Compile Include="Assets\Scripts\Praktikum01\TipToePlatform.cs" />
      <Compile Include="Assets\Scripts\Praktikum01\WinScript.cs" />
      <Compile Include="Assets\Scripts\CharacterControls\SimpleCharacterControl.cs" />
+     <Compile Include="Assets\UnityPackages\JsonNetSample\JsonNetSample.cs" />
      <Compile Include="Assets\Scripts\CharacterControls\PhysicsCharacterControls.cs" />
      <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansTerrainTools.cs" />
      <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansMeshUtils.cs" />
      <Compile Include="Assets\Quixel\Scripts\BridgeImporter\MegascansBridgeLink.cs" />
      <Compile Include="Assets\Scripts\Camera\SimpleObjectCamera.cs" />
-     <Compile Include="Assets\UnityPackages\JsonNetSample\JsonNetSample.cs" />
      <None Include="Assets\Vorgabe_Assets\FurHelper.cginc" />
      <None Include="Assets\Vorgabe_Assets\FurShader.shader" />
      <None Include="Assets\Shader\Desolve_Shader.shader" />
