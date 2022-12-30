@@ -51,23 +51,27 @@ public class NavRunnerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Agent.updatePosition = false;
-        Agent.updateRotation = false;
-
-
-        Agent.destination = Target.transform.position;
-        desiredVel = Agent.desiredVelocity;
-
-        bool jumping = false;
-        if (Agent.desiredVelocity.y > 0.01f) jumping = true;
-
         if (!InRagdoll) {
+            Agent.enabled = true;
+            Agent.updateRotation = false;
+            Agent.updatePosition = false;
+
+            bool jumping = false;
+            if (Agent.desiredVelocity.y > 0.01f) jumping = true;
+
+            Agent.destination = Target.transform.position;
+            desiredVel = Agent.desiredVelocity;
+
             Controls.Move(Agent.desiredVelocity, jumping, false);
+
             CharController.detectCollisions = true;
             Animator.enabled = true;
             Ragdoll.disable();
-            Agent.enabled = true;
             CharController.enabled = true;
+
+            Agent.transform.position = CharController.transform.position;
+           Agent.velocity = CharController.velocity;
+           Agent.nextPosition = CharController.transform.position;
         } 
 
         if (InRagdoll) {
@@ -97,9 +101,6 @@ public class NavRunnerScript : MonoBehaviour
             currentJ = 0;
         }
 
-        Agent.transform.position = CharController.transform.position;
-        Agent.velocity = CharController.velocity;
-        Agent.nextPosition = CharController.transform.position;
         setNextTargetPlatform();
     }
 
