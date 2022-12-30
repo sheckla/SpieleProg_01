@@ -775,6 +775,12 @@
     <Reference Include="Unity.Timeline.Editor">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.AI.Navigation.Editor">
+        <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.AI.Navigation.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.AI.Navigation">
+        <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.AI.Navigation.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualScripting.State">
         <HintPath>C:\Users\ddfsd\3D_Praktikum_01\Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
     </Reference>

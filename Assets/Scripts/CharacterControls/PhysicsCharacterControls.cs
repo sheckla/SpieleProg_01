@@ -202,7 +202,7 @@ public class PhysicsCharacterControls : MonoBehaviour
             GravityFactor = 1; // Reset Gravity Factor
             if (Input.GetKey("space") && Timer_JumpingCooldown >= MAX_TIME_JUMPING_COOLDOWN)
             {
-                Rbody.AddForce(transform.up * 1750);
+                Rbody.AddForce(transform.up * 500);
                 Timer_JumpingCooldown = 0;
             } else
             {
